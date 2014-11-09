@@ -15,7 +15,7 @@ from scipy.interpolate import interp1d
 from scipy.constants import physical_constants
 from numpy import pi, ceil, exp 
 
-class correction(object):
+class Correction(object):
     def __init__(self, filedef, fileref, pdef, axis=0 , q=1, \
                  x=0.54, gamma=2.0, beta=1.0, ecut=20.0, eps=1.0, plt=0, is_charge=False, out='V.dat'): 
         # read the two cube files (with electrostatic potentials) for the charged defect 
@@ -420,7 +420,7 @@ class correction(object):
         ax.autoscale(axis='x', tight=True)
         plt.show()
 
-class qfit(correction):
+class Qfit(correction):
     """fit the model charge to the defect wavefunction"""
     def __init__(self, wfcube, pdef, axis):
         self.axis = axis

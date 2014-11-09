@@ -26,7 +26,7 @@ plt = 1       # 0: n/a, 1: V, 2: rho
 #fit.fitting(q,x,gamma,beta)
 
 # correction to the total energy
-corr = fnv.correction(fdef, fref, pdef, axis, q, x, gamma, beta, ecut, eps, plt, is_charge, out)
+corr = fnv.Correction(fdef, fref, pdef, axis, q, x, gamma, beta, ecut, eps, plt, is_charge, out)
 corr.qmodel()
 corr.energy()
 #corr.convolve(0.2, is_charge)
