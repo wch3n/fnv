@@ -420,7 +420,7 @@ class Correction(object):
         ax.autoscale(axis='x', tight=True)
         plt.show()
 
-class Qfit(correction):
+class Qfit(Correction):
     """fit the model charge to the defect wavefunction"""
     def __init__(self, wfcube, pdef, axis):
         self.axis = axis
