@@ -20,11 +20,11 @@ class Correction(object):
                  x=0.54, gamma=2.0, beta=1.0, ecut=20.0, eps=1.0, plt=0, is_charge=False, out='V.dat'): 
         # read the two cube files (with electrostatic potentials) for the charged defect 
         # and the reference (neutral) calculations
-        fdef = cube.readcube(filedef)
+        fdef = cube.Readcube(filedef)
         if fileref == 'None':
             self.dat = fdef.dat
         else:
-            fref = cube.readcube(fileref)
+            fref = cube.Readcube(fileref)
             # delta_data: V(def) - V(ref)
             # Ry --> Hartree if necessary (by a factor of 0.5)
             if is_charge == False:
