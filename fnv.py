@@ -27,7 +27,7 @@ class Correction(object):
             fref = cube.Readcube(fileref)
             # delta_data: V(def) - V(ref)
             # Ry --> Hartree if necessary (by a factor of 0.5)
-            if is_charge == False:
+            if not is_charge:
                 # precautious about the sign
                 # eV -> V
                 self.delta_data = -0.5*(fdef.dat - fref.dat) 
@@ -37,7 +37,7 @@ class Correction(object):
         # rvec: real-space lattice vector
         # ngrid: the grid tuple
         rvec = fdef.rvec
-        ngrid = fdef.ng[0]
+        ngrid = fdef.ng
         
         # -------------- init the g vectors from rvec
         # ngrid: [nx, ny, nz]
@@ -153,10 +153,10 @@ class Correction(object):
         rhor = ifftn(ifftshift(self.rhogs))/dV
 
         # check the charge density localization
-        print "Charge model: %0.2f exponential (gamma=%0.2f) +% 0.2f gaussian (beta=%0.2f)" \
-               % (self.x, self.gamma, 1-self.x, self.beta)
-        print "Localization of the model charge (0-1): %5.2f" \
-               % (np.sum(self.rho0r) / np.sum(rhor.real))
+        print("Charge model: %0.2f exponential (gamma=%0.2f) +% 0.2f gaussian (beta=%0.2f)" \
+               % (self.x, self.gamma, 1-self.x, self.beta))
+        print("Localization of the model charge (0-1): %5.2f" \
+               % (np.sum(self.rho0r) / np.sum(rhor.real)))
 
         # plane-averaged charge density
         self.rhor_avg = self.planeave(rhor, self.axis)
@@ -183,13 +183,13 @@ class Correction(object):
         dim = array.shape[dir]
         avg = np.empty(dim)
         if dir == 0:
-            for i in xrange(dim):
+            for i in range(dim):
                 avg[i] = np.mean(array[i,:,:]).real
         elif dir == 1:
-            for i in xrange(dim):
+            for i in range(dim):
                 avg[i] = np.mean(array[:,i,:]).real
         else:
-            for i in xrange(dim):
+            for i in range(dim):
                 avg[i] = np.mean(array[:,:,i]).real
         return avg
 
@@ -210,7 +210,7 @@ class Correction(object):
         # indices for G vectors within the cutoff sphere 
         # note that ecut is in Ry
         self.gcut = np.nonzero(self.GG < self.ecut)
-        print "G-vectors: %i" % self.gcut[0].size        
+        print("G-vectors: %i" % self.gcut[0].size)        
 
         # Vlr: long-range potential for the periodic array
         # Vlr(G!=0) = 4*pi*q(G)/(eps*GG)  
@@ -226,10 +226,10 @@ class Correction(object):
 
         Ha = physical_constants['Hartree energy in eV'][0]
         self.Ha = Ha
-        print "unit cell volume: %8.5f bohr^3" % (self.V) 
-        print "(unscreened) V(G=0) := %8.5f" % (self.VG0*self.eps)
-        print "(unscreened) q*V(G=0)/V = %8.5f" % (self.VG0*self.q/np.sqrt(self.V)*self.eps)
-        print "(screened) q*V(G=0)/V = %8.5f eV" % (self.VG0*self.q/np.sqrt(self.V)*Ha)
+        print("unit cell volume: %8.5f bohr^3" % (self.V)) 
+        print("(unscreened) V(G=0) := %8.5f" % (self.VG0*self.eps))
+        print("(unscreened) q*V(G=0)/V = %8.5f" % (self.VG0*self.q/np.sqrt(self.V)*self.eps))
+        print("(screened) q*V(G=0)/V = %8.5f eV" % (self.VG0*self.q/np.sqrt(self.V)*Ha))
 
         Vlrr = ifftn(ifftshift(self.Vlrg))/dV
         self.Vlrr = Vlrr.real        
@@ -286,16 +286,16 @@ class Correction(object):
 
         # output
         align_der = (x*8*gamma**2 + (1-x)*beta**2)*q*pi/(self.V*self.eps)
-        print "(unscreened) Eisol: %9.5f Ha; Elatt: %9.5f Ha" \
-                % (self.Eisol*self.eps, self.Elatt*self.eps)
-        print "(unscreened) Ecorr: %9.5f Ha" % (self.Ecorr0*self.eps)        
-        print "(screened) Ecorr: %9.5f eV" % (self.Ecorr0*Ha)
-        print "SR alignment corr: %9.5f eV" % (self.Esrc*Ha)
-        print "! (screened and aligned) Ecorr: %9.5f eV" %(self.Ecorr*Ha)
-        print "! (screened) alignment derivative: %9.5f eV" % (align_der*Ha)
+        print("(unscreened) Eisol: %9.5f Ha; Elatt: %9.5f Ha" \
+                % (self.Eisol*self.eps, self.Elatt*self.eps))
+        print("(unscreened) Ecorr: %9.5f Ha" % (self.Ecorr0*self.eps))        
+        print("(screened) Ecorr: %9.5f eV" % (self.Ecorr0*Ha))
+        print("SR alignment corr: %9.5f eV" % (self.Esrc*Ha))
+        print("! (screened and aligned) Ecorr: %9.5f eV" %(self.Ecorr*Ha))
+        print("! (screened) alignment derivative: %9.5f eV" % (align_der*Ha))
 
         # plotting
-        if self.plt > 0 and self.is_charge == False:
+        if self.plt > 0 and not self.is_charge:
             if self.plt == 1:
                 font = {'fontname':'sans-serif'}
                 fig = plt.figure()
@@ -307,7 +307,7 @@ class Correction(object):
                 leg = ax.legend(('$\Delta V_{el}$', '$V_{lr}$', '$V_{sr}$'), 'upper right')
                 ax.set_xlabel (r'$z$ (bohr)', **font)
                 ax.autoscale(axis='x', tight=True)
-                np.savetxt(self.out, zip(a, delta_data_avg*Ha, Vlrr_avg*Ha), fmt='%10.4f %15.6f %15.6f')
+                np.savetxt(self.out, list(zip(a, delta_data_avg*Ha, Vlrr_avg*Ha)), fmt='%10.4f %15.6f %15.6f')
                 plt.show()
 
             if self.plt == 9:
@@ -380,7 +380,7 @@ class Correction(object):
         # remove the G=0 component from gcut
         # there must be a better solution other than this
         gcut = [0,0,0]
-        for i in xrange(3):
+        for i in range(3):
             gcut[i] = np.delete(self.gcut[i], self.gcut[i].size/2)     
         gcut = tuple(gcut)  
         Elatt = 2*pi*sum(self.rhog[gcut]**2 / self.GG[gcut]) / (self.V*self.eps)

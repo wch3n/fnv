@@ -12,20 +12,20 @@ class Readcube:
         except IOError:
             sys.exit('File not found.')
 
-        [f.readline() for i in xrange(2)]
+        [f.readline() for i in range(2)]
         # na: number of atoms
         na = int(f.readline().split()[0]) 
         # ng: 3D grid points, ns: spacing vector
         ng = np.array([[0,0,0]])
         ns = np.zeros((3,3))
-        for i in xrange(3):
+        for i in range(3):
             s = f.readline().split()
             ng[:,i] = int(s[0])
             ns[i] = float(s[1]), float(s[2]), float(s[3])
 
         # read the positions
         pos = np.zeros((na,3))
-        for i in xrange(na):
+        for i in range(na):
             s = f.readline().split()
             pos[i,:] = s[2:] 
         
@@ -65,14 +65,14 @@ class Readpot:
         scale = float(head[1])
         # rvec: real-space lattice vector
         rvec = np.zeros([3,3])        
-        for i in xrange(3):
+        for i in range(3):
             s = f.readline().split()
             rvec[i,:] = float(s[0]), float(s[1]), float(s[2])
         rvec *= scale
-        [f.readline() for i in xrange(ntype+1)]
+        [f.readline() for i in range(ntype+1)]
         # direct coordinates
         pos = np.zeros((na,3))
-        for i in xrange(na):
+        for i in range(na):
             s = f.readline().split()
             pos[i,:] = s[1:4]
         dat = f.readlines()
@@ -109,22 +109,22 @@ if __name__ == "__main__":
     cube = Readcube(sys.argv[1], float(sys.argv[2]))
     ngrid = cube.ng[0]
     # print number of atoms, and fft grid
-    print(cube.na, ngrid) 
+    print((cube.na, ngrid)) 
 
     dir = 2  # 0->x, 1->y, 2->z
     
     avg_1d = np.zeros(ngrid[dir])
-    for i in xrange(ngrid[dir]):
+    for i in range(ngrid[dir]):
         avg_1d[i] = np.average(cube.dat[:,:,i])
     
     zlen = np.linalg.norm(cube.rvec[dir,:])
     z = np.linspace(0, zlen, ngrid[dir],endpoint=False)
 
     if float(sys.argv[2]) == 0:
-        dump = zip(z, avg_1d)
+        dump = list(zip(z, avg_1d))
     else:
         shift = Shift1d(z, avg_1d, cube.zdef)
-        dump = zip(z, shift.ys.real)
+        dump = list(zip(z, shift.ys.real))
 
     np.savetxt(sys.argv[1].rsplit(".")[0]+"_1d.dat",dump)
 
