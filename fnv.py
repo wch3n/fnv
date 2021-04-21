@@ -381,7 +381,7 @@ class Correction(object):
         # there must be a better solution other than this
         gcut = [0,0,0]
         for i in range(3):
-            gcut[i] = np.delete(self.gcut[i], self.gcut[i].size/2)     
+            gcut[i] = np.delete(self.gcut[i], int(self.gcut[i].size/2))
         gcut = tuple(gcut)  
         Elatt = 2*pi*sum(self.rhog[gcut]**2 / self.GG[gcut]) / (self.V*self.eps)
         # add qV(G=0) for consistent alignment
